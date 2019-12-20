@@ -433,9 +433,16 @@ text(interval_max-200, 150, labels = &quot;Max Num&quot;)</code></pre>
 <h2>Imputing missing values</h2>
 <pre class="r"><code># Calculate the total missing value in the dataframe
 missing_rows &lt;- sum(apply(activity, 1, function(x) {sum(is.na(x))}))
-missing_rows</code></pre>
-<pre><code>## [1] 2304</code></pre>
-<p>The total number of missing rows is <strong>2304</strong></p>
+summary(activity)</code></pre>
+<pre><code>##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+##  3rd Qu.: 12.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+##  NA's   :2304</code></pre>
+<p>The total number of missing rows is <strong>2304</strong> Using summary function is the simplest way to find how many missing rows exist in each variable.</p>
 <p>All the missing values exist in “steps” variable, so “steps” column is the only column we need to deal with during imputation. I use the simpliest impute strategy that is just using the mean steps by interval. I use the dplyr to reshape the dataframe and get the mean steps by interval, and then fill in the missing values in steps.</p>
 <pre class="r"><code>steps_na &lt;-
     (activity %&gt;%

@@ -62,12 +62,14 @@ The Interval contains Max Number of Steps is **`r activity_interval[which.max(ac
 ```{r Missing_Rows, echo=TRUE}
 # Calculate the total missing value in the dataframe
 missing_rows <- sum(apply(activity, 1, function(x) {sum(is.na(x))}))
-missing_rows
+summary(activity)
 ```
 The total number of missing rows is **`r missing_rows`**
+Using summary function is the simplest way to find how many missing rows exist in each variable.
 
 All the missing values exist in "steps" variable, so "steps" column is the only column we need to deal with during imputation.
-I use the simpliest impute strategy that is just using the mean steps by interval. I use the dplyr to reshape the dataframe and get the mean steps by interval, and then fill in the missing values in steps.
+I use the simpliest impute strategy that is just using the mean steps by interval. 
+I use the dplyr to reshape the dataframe and get the mean steps by interval, and then fill in the missing values in steps.
 
 ```{r Historgram_Without_Missing_Values, echo=TRUE}
 steps_na <-

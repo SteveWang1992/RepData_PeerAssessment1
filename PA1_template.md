@@ -109,16 +109,25 @@ The Interval contains Max Number of Steps is **835**
 ```r
 # Calculate the total missing value in the dataframe
 missing_rows <- sum(apply(activity, 1, function(x) {sum(is.na(x))}))
-missing_rows
+summary(activity)
 ```
 
 ```
-## [1] 2304
+##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+##  3rd Qu.: 12.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+##  NA's   :2304
 ```
 The total number of missing rows is **2304**
+Using summary function is the simplest way to find how many missing rows exist in each variable.
 
 All the missing values exist in "steps" variable, so "steps" column is the only column we need to deal with during imputation.
-I use the simpliest impute strategy that is just using the mean steps by interval. I use the dplyr to reshape the dataframe and get the mean steps by interval, and then fill in the missing values in steps.
+I use the simpliest impute strategy that is just using the mean steps by interval. 
+I use the dplyr to reshape the dataframe and get the mean steps by interval, and then fill in the missing values in steps.
 
 
 ```r
