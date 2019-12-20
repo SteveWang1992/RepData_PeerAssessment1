@@ -57,10 +57,10 @@ activity_mean <-
     summarise(total_steps = sum(steps, na.rm = TRUE)) %>%
     ungroup()
 
-hist(activity_mean$total_steps, breaks = 8, col = "wheat")
+hist(activity_mean$total_steps, breaks = 8, col = "wheat", xlab = "Bins", ylab = "Frequency", main = "Average Steps Taken Per Day Historgram")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+![](PA1_template_files/figure-html/Historgram_Original-1.png)<!-- -->
 
 Get the mean total number of steps taken per day.
 
@@ -90,28 +90,35 @@ The median total number of steps taken per day is **1.0395\times 10^{4}**
 
 ## What is the average daily activity pattern?
 
+
 ```r
 activity_interval <- activity %>% group_by(interval) %>% summarise(steps_by_interval = mean(steps, na.rm = TRUE))
 interval_max <- activity_interval[which.max(activity_interval$steps_by_interval), "interval"]
-with(activity_interval, plot(interval, steps_by_interval, col = "orange", type = "l"))
+with(activity_interval, plot(interval, steps_by_interval, col = "orange", type = "l", ylab = "steps", main = "Interval VS Steps Line Plot"))
 abline(v = interval_max, lty = 2, lwd = 3)
 text(interval_max-200, 150, labels = "Max Num")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](PA1_template_files/figure-html/Interval_vs_Steps-1.png)<!-- -->
 
 The Interval contains Max Number of Steps is **835**
 
 ## Imputing missing values
 
+
 ```r
 # Calculate the total missing value in the dataframe
-sum(is.na(activity))
+missing_rows <- sum(apply(activity, 1, function(x) {sum(is.na(x))}))
+missing_rows
 ```
 
 ```
 ## [1] 2304
 ```
+The total number of missing rows is **2304**
+
+All the missing values exist in "steps" variable, so "steps" column is the only column we need to deal with during imputation.
+I use the simpliest impute strategy that is just using the mean steps by interval. I use the dplyr to reshape the dataframe and get the mean steps by interval, and then fill in the missing values in steps.
 
 
 ```r
@@ -125,10 +132,10 @@ activity[is.na(activity$steps), "steps"] <- steps_na$mean_steps
 
 new_activity_mean <- activity %>% group_by(date) %>% summarise(total_steps = sum(steps))
 
-hist(new_activity_mean$total_steps, breaks = 8, col = "green")
+hist(new_activity_mean$total_steps, breaks = 8, col = "green", xlab = "bins", ylab = "Frequency", main = "Average Steps Taken Per Day Historgram Without Missing Values")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](PA1_template_files/figure-html/Historgram_Without_Missing_Values-1.png)<!-- -->
 
 Get the mean total number of steps taken per day.
 
@@ -177,6 +184,6 @@ activity_weekday <- activity %>% group_by(interval, week_col) %>% summarise(mean
 xyplot(mean_steps ~ interval | week_col, data = activity_weekday, type = "l", layout = c(1, 2), xlab = "Interval", ylab = "Number of Steps")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+![](PA1_template_files/figure-html/Panel_Plot-1.png)<!-- -->
 
 The plot shows that average steps in weekdays got bigger increase than the average steps in weekend after interval beyond 500. 

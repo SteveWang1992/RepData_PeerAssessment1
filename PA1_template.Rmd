@@ -8,7 +8,7 @@ output:
 
 ## Loading and preprocessing the data
 
-```{r echo=TRUE}
+```{r Package_Loading, echo=TRUE}
 library(readr)
 activity <- read_csv("/Users/steve/Desktop/datascience-JHU/Reproducible_Research/RepData_PeerAssessment1/activity.csv")
 ```
@@ -17,7 +17,7 @@ activity <- read_csv("/Users/steve/Desktop/datascience-JHU/Reproducible_Research
 
 Load **tidyr** and **dplyr**, and preprocess the original dataframe and create the historgram.
 
-```{r echo=TRUE}
+```{r Historgram_Original, echo=TRUE}
 library(tidyr)
 library(dplyr)
 activity_mean <-
@@ -26,12 +26,12 @@ activity_mean <-
     summarise(total_steps = sum(steps, na.rm = TRUE)) %>%
     ungroup()
 
-hist(activity_mean$total_steps, breaks = 8, col = "wheat")
+hist(activity_mean$total_steps, breaks = 8, col = "wheat", xlab = "Bins", ylab = "Frequency", main = "Average Steps Taken Per Day Historgram")
 ```
 
 Get the mean total number of steps taken per day.
 
-```{r echo=TRUE}
+```{r Mean_Calc_1, echo=TRUE}
 mean(activity_mean$total_steps)
 ```
 
@@ -39,17 +39,18 @@ The mean total number of steps taken per day is **`r round(mean(activity_mean$to
 
 Get the median total number of steps taken per day.
 
-```{r echo=TRUE}
+```{r Median_Calc_1, echo=TRUE}
 median(activity_mean$total_steps)
 ```
 
 The median total number of steps taken per day is **`r median(activity_mean$total_steps)`**
 
 ## What is the average daily activity pattern?
-```{r echo=TRUE}
+
+```{r Interval_vs_Steps, echo=TRUE}
 activity_interval <- activity %>% group_by(interval) %>% summarise(steps_by_interval = mean(steps, na.rm = TRUE))
 interval_max <- activity_interval[which.max(activity_interval$steps_by_interval), "interval"]
-with(activity_interval, plot(interval, steps_by_interval, col = "orange", type = "l"))
+with(activity_interval, plot(interval, steps_by_interval, col = "orange", type = "l", ylab = "steps", main = "Interval VS Steps Line Plot"))
 abline(v = interval_max, lty = 2, lwd = 3)
 text(interval_max-200, 150, labels = "Max Num")
 ```
@@ -57,12 +58,18 @@ text(interval_max-200, 150, labels = "Max Num")
 The Interval contains Max Number of Steps is **`r activity_interval[which.max(activity_interval$steps_by_interval), "interval"]`**
 
 ## Imputing missing values
-```{r echo=TRUE}
-# Calculate the total missing value in the dataframe
-sum(is.na(activity))
-```
 
-```{r echo=TRUE}
+```{r Missing_Rows, echo=TRUE}
+# Calculate the total missing value in the dataframe
+missing_rows <- sum(apply(activity, 1, function(x) {sum(is.na(x))}))
+missing_rows
+```
+The total number of missing rows is **`r missing_rows`**
+
+All the missing values exist in "steps" variable, so "steps" column is the only column we need to deal with during imputation.
+I use the simpliest impute strategy that is just using the mean steps by interval. I use the dplyr to reshape the dataframe and get the mean steps by interval, and then fill in the missing values in steps.
+
+```{r Historgram_Without_Missing_Values, echo=TRUE}
 steps_na <-
     (activity %>%
          group_by(interval) %>%
@@ -73,12 +80,12 @@ activity[is.na(activity$steps), "steps"] <- steps_na$mean_steps
 
 new_activity_mean <- activity %>% group_by(date) %>% summarise(total_steps = sum(steps))
 
-hist(new_activity_mean$total_steps, breaks = 8, col = "green")
+hist(new_activity_mean$total_steps, breaks = 8, col = "green", xlab = "bins", ylab = "Frequency", main = "Average Steps Taken Per Day Historgram Without Missing Values")
 ```
 
 Get the mean total number of steps taken per day.
 
-```{r echo=TRUE}
+```{r Mean_Calc_2, echo=TRUE}
 mean(new_activity_mean$total_steps)
 ```
 
@@ -86,7 +93,7 @@ The mean total number of steps taken per day is **`r round(mean(new_activity_mea
 
 Get the median total number of steps taken per day.
 
-```{r echo=TRUE}
+```{r Median_Calc_2, echo=TRUE}
 median(new_activity_mean$total_steps)
 ```
 
@@ -104,7 +111,7 @@ The imputation increase both the mean value and the median value, and make the g
 
 Showing the differences in activity patterns between weekdays and weekends by using xyplot in lattice package.
 
-```{r echo=TRUE}
+```{r Panel_Plot, echo=TRUE}
 library(lattice)
 activity$week_col <- weekdays(activity$date) %in% c("Saturday", "Sunday")
 activity$week_col <- factor(activity$week_col, levels = c(TRUE, FALSE), labels = c("weekend", "weekday"))
